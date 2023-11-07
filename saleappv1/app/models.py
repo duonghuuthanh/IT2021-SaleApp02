@@ -1,6 +1,18 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import relationship
 from app import db
+from flask_login import UserMixin
+
+
+class User(db.Model, UserMixin):
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), nullable=False)
+    username = Column(String(50), nullable=False, unique=True)
+    password = Column(String(100), nullable=False)
+    avatar = Column(String(100), default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg')
+
+    def __str__(self):
+        return self.name
 
 
 class Category(db.Model):
@@ -9,6 +21,9 @@ class Category(db.Model):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(50), nullable=False, unique=True)
     products = relationship('Product', backref='category', lazy=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Product(db.Model):
@@ -22,12 +37,14 @@ class Product(db.Model):
 if __name__ == "__main__":
     from app import app
     with app.app_context():
-        # c1 = Category(name='Mobile')
-        # c2 = Category(name='Tablet')
-        #
-        # db.session.add(c1)
-        # db.session.add(c2)
-        # db.session.commit()
+        db.create_all()
+
+        c1 = Category(name='Mobile')
+        c2 = Category(name='Tablet')
+
+        db.session.add(c1)
+        db.session.add(c2)
+        db.session.commit()
 
         p1 = Product(name='iPad Pro 2022', price=24000000, category_id=2,
                      image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg")
@@ -43,4 +60,4 @@ if __name__ == "__main__":
         db.session.add_all([p1, p2, p3, p4, p5])
         db.session.commit()
 
-        # db.create_all()
+
