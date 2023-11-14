@@ -1,7 +1,13 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from app import db
 from flask_login import UserMixin
+import enum
+
+
+class UserRoleEnum(enum.Enum):
+    USER = 1
+    ADMIN = 2
 
 
 class User(db.Model, UserMixin):
@@ -9,7 +15,9 @@ class User(db.Model, UserMixin):
     name = Column(String(50), nullable=False)
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
-    avatar = Column(String(100), default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg')
+    avatar = Column(String(100),
+                    default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg')
+    user_role = Column(Enum(UserRoleEnum), default=UserRoleEnum.USER)
 
     def __str__(self):
         return self.name
@@ -33,31 +41,51 @@ class Product(db.Model):
     image = Column(String(100))
     category_id = Column(Integer, ForeignKey(Category.id), nullable=False)
 
+    def __str__(self):
+        return self.name
+
 
 if __name__ == "__main__":
     from app import app
     with app.app_context():
-        db.create_all()
+        # db.create_all()
 
-        c1 = Category(name='Mobile')
-        c2 = Category(name='Tablet')
-
-        db.session.add(c1)
-        db.session.add(c2)
-        db.session.commit()
+        # import hashlib
+        # u = User(name='Admin',
+        #          username='admin',
+        #          password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #          user_role=UserRoleEnum.ADMIN)
+        # db.session.add(u)
+        # db.session.commit()
+        #
+        # c1 = Category(name='Mobile')
+        # c2 = Category(name='Tablet')
+        #
+        # db.session.add(c1)
+        # db.session.add(c2)
+        # db.session.commit()
 
         p1 = Product(name='iPad Pro 2022', price=24000000, category_id=2,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg")
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
         p2 = Product(name='iPhone 13', price=21000000, category_id=1,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg")
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
         p3 = Product(name='Galaxy S23', price=24000000, category_id=1,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg")
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
         p4 = Product(name='Note 22', price=22000000, category_id=1,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg")
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
         p5 = Product(name='Galaxy Tab S9', price=24000000, category_id=2,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg")
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
+        p6 = Product(name='iPad Pro 2023', price=24000000, category_id=2,
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
+        p7 = Product(name='iPhone 15 Pro', price=21000000, category_id=1,
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
+        p8 = Product(name='Galaxy S24', price=24000000, category_id=1,
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
+        p9 = Product(name='Note 23 Pro', price=22000000, category_id=1,
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
+        p10 = Product(name='Galaxy Tab S9 Ultra', price=24000000, category_id=2,
+                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
 
-        db.session.add_all([p1, p2, p3, p4, p5])
+        # db.session.add_all([p1, p2, p3, p4, p5])
+        db.session.add_all([p6, p7, p8, p9, p10])
         db.session.commit()
-
-
