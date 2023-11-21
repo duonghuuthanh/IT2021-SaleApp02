@@ -48,22 +48,22 @@ class Product(db.Model):
 if __name__ == "__main__":
     from app import app
     with app.app_context():
-        # db.create_all()
+        db.create_all()
 
-        # import hashlib
-        # u = User(name='Admin',
-        #          username='admin',
-        #          password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-        #          user_role=UserRoleEnum.ADMIN)
-        # db.session.add(u)
-        # db.session.commit()
-        #
-        # c1 = Category(name='Mobile')
-        # c2 = Category(name='Tablet')
-        #
-        # db.session.add(c1)
-        # db.session.add(c2)
-        # db.session.commit()
+        import hashlib
+        u = User(name='Admin',
+                 username='admin',
+                 password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+                 user_role=UserRoleEnum.ADMIN)
+        db.session.add(u)
+        db.session.commit()
+
+        c1 = Category(name='Mobile')
+        c2 = Category(name='Tablet')
+
+        db.session.add(c1)
+        db.session.add(c2)
+        db.session.commit()
 
         p1 = Product(name='iPad Pro 2022', price=24000000, category_id=2,
                      image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
@@ -86,6 +86,6 @@ if __name__ == "__main__":
         p10 = Product(name='Galaxy Tab S9 Ultra', price=24000000, category_id=2,
                      image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
 
-        # db.session.add_all([p1, p2, p3, p4, p5])
+        db.session.add_all([p1, p2, p3, p4, p5])
         db.session.add_all([p6, p7, p8, p9, p10])
         db.session.commit()

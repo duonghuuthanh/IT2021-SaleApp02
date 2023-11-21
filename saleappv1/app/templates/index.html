@@ -4,7 +4,6 @@
 
 {% block content %}
 
-
 <section class="container">
     <ul class="pagination mt-1">
         {% for i in range(pages) %}
@@ -21,11 +20,13 @@
                     <h4 class="card-title">{{ p.name }}</h4>
                     <p class="card-text">{{ p.price }} VNĐ</p>
                     <a href="/products/{{p.id}}" class="btn btn-primary">Xem chi tiết</a>
-                    <a href="#" class="btn btn-danger">Đặt hàng</a>
+                    <a href="#" class="btn btn-danger" onclick="addToCart({{p.id}}, '{{p.name}}', {{p.price}})">Đặt hàng</a>
                 </div>
             </div>
         </div>
         {% endfor %}
     </div>
 </section>
+
+<script src="{{ url_for('static', filename='js/cart.js') }}"></script>
 {% endblock %}
