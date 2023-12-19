@@ -27,6 +27,11 @@ def details(id):
     return render_template('details.html')
 
 
+@app.route("/login")
+def login_user_process():
+    return render_template('login.html')
+
+
 @app.route('/admin/login', methods=['post'])
 def login_admin_process():
     username = request.form.get('username')
@@ -64,7 +69,6 @@ def add_cart():
         cart = {}
 
     data = request.json
-    print(data)
     id = str(data.get("id"))
 
     if id in cart: # san pham da co trong gio
@@ -76,6 +80,29 @@ def add_cart():
             "price": data.get("price"),
             "quantity": 1
         }
+
+    session['cart'] = cart
+
+    return jsonify(utils.count_cart(cart))
+
+
+@app.route("/api/cart/<product_id>", methods=['put'])
+def update_cart(product_id):
+    cart = session.get('cart')
+    if cart and product_id in cart:
+        quantity = request.json.get('quantity')
+        cart[product_id]['quantity'] = int(quantity)
+
+    session['cart'] = cart
+
+    return jsonify(utils.count_cart(cart))
+
+
+@app.route("/api/cart/<product_id>", methods=['delete'])
+def delete_cart(product_id):
+    cart = session.get('cart')
+    if cart and product_id in cart:
+        del cart[product_id]
 
     session['cart'] = cart
 
