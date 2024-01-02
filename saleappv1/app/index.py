@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, session, jsonify
 import dao
 import utils
 from app import app, login
-from flask_login import login_user
+from flask_login import login_user, logout_user
 
 
 @app.route('/')
@@ -27,9 +27,49 @@ def details(id):
     return render_template('details.html')
 
 
-@app.route("/login")
+@app.route("/login", methods=['get', 'post'])
 def login_user_process():
+    if request.method.__eq__('POST'):
+        username = request.form.get('username')
+        password = request.form.get('password')
+
+        user = dao.auth_user(username=username, password=password)
+        if user:
+            login_user(user=user)
+
+        next = request.args.get('next')
+        return redirect("/" if next is None else next)
+
     return render_template('login.html')
+
+
+@app.route('/logout')
+def process_logout_user():
+    logout_user()
+    return redirect("/login")
+
+
+@app.route('/register', methods=['get', 'post'])
+def register_user():
+    err_msg = ""
+    if request.method.__eq__('POST'):
+        password = request.form.get('password')
+        confirm = request.form.get('confirm')
+
+        if password.__eq__(confirm):
+            try:
+                dao.add_user(name=request.form.get('name'),
+                             username=request.form.get('username'),
+                             password=password,
+                             avatar=request.files.get('avatar'))
+            except:
+                err_msg = 'Hệ thống đang bị lỗi!'
+            else:
+                return redirect('/login')
+        else:
+            err_msg = 'Mật khẩu KHÔNG khớp!'
+
+    return render_template('register.html', err_msg=err_msg)
 
 
 @app.route('/admin/login', methods=['post'])
@@ -107,6 +147,17 @@ def delete_cart(product_id):
     session['cart'] = cart
 
     return jsonify(utils.count_cart(cart))
+
+
+@app.route('/api/pay', methods=['post'])
+def pay():
+    try:
+        dao.add_receipt(session.get('cart'))
+    except:
+        return jsonify({'status': 500, 'err_msg': 'Hệ thống đang có lỗi!'})
+    else:
+        del session['cart']
+        return jsonify({'status': 200})
 
 
 @app.route('/cart')

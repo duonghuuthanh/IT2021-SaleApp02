@@ -3,6 +3,7 @@ from sqlalchemy.orm import relationship
 from app import db
 from flask_login import UserMixin
 import enum
+from datetime import datetime
 
 
 class UserRoleEnum(enum.Enum):
@@ -16,7 +17,7 @@ class User(db.Model, UserMixin):
     username = Column(String(50), nullable=False, unique=True)
     password = Column(String(100), nullable=False)
     avatar = Column(String(100),
-                    default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1690461425/bqjr27d0xjx4u78ghp3s.jpg')
+                    default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg')
     user_role = Column(Enum(UserRoleEnum), default=UserRoleEnum.USER)
     receipts = relationship('Receipt', backref='user', lazy=True)
 
@@ -51,7 +52,7 @@ class BaseModel(db.Model):
     __abstract__ = True
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    created_date = Column(DateTime)
+    created_date = Column(DateTime, default=datetime.now())
     active = Column(Boolean, default=True)
 
 
