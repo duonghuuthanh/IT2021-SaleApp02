@@ -20,6 +20,7 @@ class User(db.Model, UserMixin):
                     default='https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg')
     user_role = Column(Enum(UserRoleEnum), default=UserRoleEnum.USER)
     receipts = relationship('Receipt', backref='user', lazy=True)
+    comments = relationship('Comment', backref='user', lazy=True)
 
     def __str__(self):
         return self.name
@@ -43,6 +44,7 @@ class Product(db.Model):
     image = Column(String(100))
     category_id = Column(Integer, ForeignKey(Category.id), nullable=False)
     receipt_details = relationship('ReceiptDetails', backref='product', lazy=True)
+    comments = relationship('Comment', backref='product', lazy=True)
 
     def __str__(self):
         return self.name
@@ -68,47 +70,59 @@ class ReceiptDetails(BaseModel):
     product_id = Column(Integer, ForeignKey(Product.id), nullable=False)
 
 
+class Interaction(BaseModel):
+    __abstract__ = True
+
+    product_id = Column(Integer, ForeignKey(Product.id), nullable=False)
+    user_id = Column(Integer, ForeignKey(User.id), nullable=False)
+
+
+class Comment(Interaction):
+    content = Column(String(255), nullable=False)
+    created_date = Column(DateTime, default=datetime.now())
+
+
 if __name__ == "__main__":
     from app import app
     with app.app_context():
         db.create_all()
 
-        import hashlib
-        u = User(name='Admin',
-                 username='admin',
-                 password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
-                 user_role=UserRoleEnum.ADMIN)
-        db.session.add(u)
-        db.session.commit()
-
-        c1 = Category(name='Mobile')
-        c2 = Category(name='Tablet')
-
-        db.session.add(c1)
-        db.session.add(c2)
-        db.session.commit()
-
-        p1 = Product(name='iPad Pro 2022', price=24000000, category_id=2,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
-        p2 = Product(name='iPhone 13', price=21000000, category_id=1,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
-        p3 = Product(name='Galaxy S23', price=24000000, category_id=1,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
-        p4 = Product(name='Note 22', price=22000000, category_id=1,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
-        p5 = Product(name='Galaxy Tab S9', price=24000000, category_id=2,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
-        p6 = Product(name='iPad Pro 2023', price=24000000, category_id=2,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
-        p7 = Product(name='iPhone 15 Pro', price=21000000, category_id=1,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
-        p8 = Product(name='Galaxy S24', price=24000000, category_id=1,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
-        p9 = Product(name='Note 23 Pro', price=22000000, category_id=1,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
-        p10 = Product(name='Galaxy Tab S9 Ultra', price=24000000, category_id=2,
-                     image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
-
-        db.session.add_all([p1, p2, p3, p4, p5])
-        db.session.add_all([p6, p7, p8, p9, p10])
-        db.session.commit()
+        # import hashlib
+        # u = User(name='Admin',
+        #          username='admin',
+        #          password=str(hashlib.md5('123456'.encode('utf-8')).hexdigest()),
+        #          user_role=UserRoleEnum.ADMIN)
+        # db.session.add(u)
+        # db.session.commit()
+        #
+        # c1 = Category(name='Mobile')
+        # c2 = Category(name='Tablet')
+        #
+        # db.session.add(c1)
+        # db.session.add(c2)
+        # db.session.commit()
+        #
+        # p1 = Product(name='iPad Pro 2022', price=24000000, category_id=2,
+        #              image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
+        # p2 = Product(name='iPhone 13', price=21000000, category_id=1,
+        #              image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
+        # p3 = Product(name='Galaxy S23', price=24000000, category_id=1,
+        #              image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
+        # p4 = Product(name='Note 22', price=22000000, category_id=1,
+        #              image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
+        # p5 = Product(name='Galaxy Tab S9', price=24000000, category_id=2,
+        #              image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
+        # p6 = Product(name='iPad Pro 2023', price=24000000, category_id=2,
+        #              image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
+        # p7 = Product(name='iPhone 15 Pro', price=21000000, category_id=1,
+        #              image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
+        # p8 = Product(name='Galaxy S24', price=24000000, category_id=1,
+        #              image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
+        # p9 = Product(name='Note 23 Pro', price=22000000, category_id=1,
+        #              image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1690528735/cg6clgelp8zjwlehqsst.jpg")
+        # p10 = Product(name='Galaxy Tab S9 Ultra', price=24000000, category_id=2,
+        #               image="https://res.cloudinary.com/dxxwcby8l/image/upload/v1691062682/tkeflqgroeil781yplxt.jpg")
+        #
+        # db.session.add_all([p1, p2, p3, p4, p5])
+        # db.session.add_all([p6, p7, p8, p9, p10])
+        # db.session.commit()

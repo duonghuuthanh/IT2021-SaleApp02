@@ -3,7 +3,7 @@ from flask import render_template, request, redirect, session, jsonify
 import dao
 import utils
 from app import app, login
-from flask_login import login_user, logout_user
+from flask_login import login_user, logout_user, login_required
 
 
 @app.route('/')
@@ -12,7 +12,6 @@ def index():
     cate_id = request.args.get('cate_id')
     page = request.args.get("page")
 
-    cates = dao.load_categories()
     products = dao.load_products(kw=kw, cate_id=cate_id, page=page)
 
     total = dao.count_product()
@@ -24,7 +23,22 @@ def index():
 
 @app.route('/products/<id>')
 def details(id):
-    return render_template('details.html')
+    comments = dao.get_comments_by_prod_id(id)
+    return render_template('details.html', product=dao.get_product_by_id(id), comments=comments)
+
+
+@app.route("/api/products/<id>/comments", methods=['post'])
+@login_required
+def add_comment(id):
+    content = request.json.get('content')
+
+    try:
+        c = dao.add_comment(product_id=id, content=content)
+    except:
+        return jsonify({'status': 500, 'err_msg': 'Hệ thống đang có lỗi!'})
+    else:
+
+        return jsonify({'status': 200, "c": {'content': c.content, "user": {"avatar": c.user.avatar}}})
 
 
 @app.route("/login", methods=['get', 'post'])
